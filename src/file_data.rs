@@ -23,7 +23,7 @@ impl FileData {
         file_size: Option<i64>, 
         file_url: Option<&str>,
         dt: Option<i64>,
-        dt_fmt: Option<String>,
+        dt_fmt: Option<&str>,
     ) -> Self {
         Self { 
             file_name: file_name.map(|x| x.to_string()), 

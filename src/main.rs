@@ -13,11 +13,9 @@ async fn main() -> Result<()> {
     let now = Instant::now();
     let client = get_aws_client("eu-central-1").await;
     let config = Config::new()?;
-    println!("{}", config);
     let df = handler(client.clone(), config.clone()).await?;
     let id = Uuid::new_v4().to_string();
     let key = format!("{}item={}/id={}-table=data_indexer.parquet", &config.prefix_target, &config.item_name, &id);
-    println!("{}", key);
     write_df_to_s3(client, &config.bucket_target, &key, df).await?;
     println!("end processing elapsed: {:.2?}", now.elapsed());
     

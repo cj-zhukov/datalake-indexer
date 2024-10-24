@@ -1,5 +1,6 @@
 use anyhow::Result;
 use aws_sdk_s3::Client;
+use chrono::prelude::*;
 use datafusion::prelude::*;
 use std::path::Path;
 
@@ -25,7 +26,13 @@ pub async fn handler(client: Client, config: Config) -> Result<DataFrame> {
         let file_type = path.extension().map(|x| x.to_string_lossy().to_string());
         let file_path = path.parent().map(|x| x.to_string_lossy().to_string());
         let file_url = Some(format!("s3://{}/{}", &config.bucket_source, file));
-        let dt_fmt = None;
+        let dt_fmt = match dt {
+            Some(dt) => {
+                let dt = Utc.timestamp_opt(dt, 0).unwrap();
+                Some(dt.to_string())
+            },
+            None => None
+        };
 
         let file_data = FileData::new(
             file_name.as_deref(), 
@@ -34,7 +41,7 @@ pub async fn handler(client: Client, config: Config) -> Result<DataFrame> {
             file_size,
             file_url.as_deref(),
             dt,
-            dt_fmt,
+            dt_fmt.as_deref(),
         );
 
         file_data_all.push(file_data);
