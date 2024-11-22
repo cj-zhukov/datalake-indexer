@@ -28,6 +28,15 @@ pub async fn handler(client: Client, config: Config) -> Result<DataFrame> {
         let file_name = path.file_name().map(|x| x.to_string_lossy().to_string());
         let file_type = path.extension().map(|x| x.to_string_lossy().to_string());
         let file_path = path.parent().map(|x| x.to_string_lossy().to_string());
+        let file_path = match file_path {
+            Some(path) => match &file_name {
+                Some(file) => {
+                    Some(format!("{path}/{file}"))
+                },
+                None => None
+            },
+            None => None
+        };
         let file_url = Some(format!("s3://{}/{}", &config.bucket_source, file));
         let dt_fmt = match dt {
             Some(dt) => {
